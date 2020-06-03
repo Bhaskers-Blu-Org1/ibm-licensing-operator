@@ -19,6 +19,8 @@ package ibmlicensing
 import (
 	"context"
 	"fmt"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"reflect"
 	"time"
 
@@ -106,8 +108,6 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 		&rbacv1.ClusterRole{},
 		&rbacv1.ClusterRoleBinding{},
 		&corev1.ServiceAccount{},
-		&corev1.Secret{},
-		&corev1.ConfigMap{},
 		&appsv1.Deployment{},
 		&corev1.Service{},
 		&extensionsv1.Ingress{},
@@ -335,19 +335,33 @@ func (r *ReconcileIBMLicensing) reconcileNamespace(instance *operatorv1alpha1.IB
 
 func (r *ReconcileIBMLicensing) reconcileAPISecretToken(instance *operatorv1alpha1.IBMLicensing) (reconcile.Result, error) {
 	expectedSecret := res.GetAPISecretToken(instance)
-	foundSecret := &corev1.Secret{}
+	foundSecret := &unstructured.Unstructured{}
+	foundSecret.SetGroupVersionKind(schema.GroupVersionKind{
+		Kind:    "Secret",
+		Version: "v1",
+	})
+
 	return r.reconcileResourceNamespacedExistence(instance, expectedSecret, foundSecret)
 }
 
 func (r *ReconcileIBMLicensing) reconcileUploadToken(instance *operatorv1alpha1.IBMLicensing) (reconcile.Result, error) {
 	expectedSecret := res.GetUploadToken(instance)
-	foundSecret := &corev1.Secret{}
+	foundSecret := &unstructured.Unstructured{}
+	foundSecret.SetGroupVersionKind(schema.GroupVersionKind{
+		Kind:    "Secret",
+		Version: "v1",
+	})
+
 	return r.reconcileResourceNamespacedExistence(instance, expectedSecret, foundSecret)
 }
 
 func (r *ReconcileIBMLicensing) reconcileUploadConfigMap(instance *operatorv1alpha1.IBMLicensing) (reconcile.Result, error) {
 	expectedCM := res.GetUploadConfigMap(instance)
-	foundCM := &corev1.ConfigMap{}
+	foundCM := &unstructured.Unstructured{}
+	foundCM.SetGroupVersionKind(schema.GroupVersionKind{
+		Kind:    "ConfigMap",
+		Version: "v1",
+	})
 	return r.reconcileResourceNamespacedExistence(instance, expectedCM, foundCM)
 }
 
